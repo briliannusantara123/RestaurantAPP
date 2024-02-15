@@ -1,21 +1,21 @@
 <?php 
 // PENDAPATAN & ORDER HARI INI
 $hari_ini = Carbon\Carbon::today();
-$earning = App\Order::whereDate('created_at', $hari_ini)->sum('subtotal');
+$earning = App\Order::whereDate('created_at', $hari_ini)->sum('total');
 $today_order = App\Order::whereDate('created_at', $hari_ini)->count();
 
 // PENDAPATAN & ORDER BULAN INI
 $bulan_ini = Carbon\Carbon::now()->month;
-$earning_month = App\Order::whereMonth('created_at', $bulan_ini)->sum('subtotal');
+$earning_month = App\Order::whereMonth('created_at', $bulan_ini)->sum('total');
 $month_order = App\Order::whereMonth('created_at', $bulan_ini)->count();
 
 // PENDAPATAN & ORDER TAHUN INI
 $tahun_ini = Carbon\Carbon::now()->year;
-$earning_year = App\Order::whereYear('created_at', $tahun_ini)->sum('subtotal');
+$earning_year = App\Order::whereYear('created_at', $tahun_ini)->sum('total');
 $year_order = App\Order::whereYear('created_at', $tahun_ini)->count();
 
 // PENDAPATAN & ORDER SELAMA INI
-$jml_pendapatan = App\Order::where('status_order','Beres')->sum('subtotal');
+$jml_pendapatan = App\Order::where('status_order','Beres')->sum('total');
 $jml_order = App\Order::where('status_order', 'Beres')->count();
 
  ?>
@@ -306,19 +306,19 @@ $jml_order = App\Order::where('status_order', 'Beres')->count();
 <script src="{{url('polished/js/Chart.min.js')}}"></script>
 <?php
 
-$orders = App\Order::all();
-        $orders->transform(function($order) {
-            $order->cart = unserialize($order->cart);
-            return $order;
-        });
-foreach ($orders as $order) {
-  foreach ($order->cart->items as $key) {
-    $menu = $key['item']['nama_masakan'];
-  }
-}
+// $orders = App\Order::all();
+//         $orders->transform(function($order) {
+//             $order->cart = unserialize($order->cart);
+//             return $order;
+//         });
+// foreach ($orders as $order) {
+//   foreach ($order->cart->items as $key) {
+//     $menu = $key['item']['nama_masakan'];
+//   }
+// }
 
-$data = App\Transaksi::join('orders', 'transactions.order_id_order', '=', 'orders.id_order')
-            ->select('transactions.tanggal_transaksi', 'orders.subtotal')
+$data = App\Transaksi::join('orders', 'transactions.id_order', '=', 'orders.id')
+            ->select('transactions.tanggal_transaksi', 'orders.total')
             ->get();
 
 $star_date = strtotime(date('Y-m-d'));
@@ -333,7 +333,7 @@ while($x < 10) {
   $tanggal = date('Y-m-d', $date);
   $tgl = date('d M', $date);
   $jum = $data->where('tanggal_transaksi','like',$tanggal)->count();
-  $price = $data->where('tanggal_transaksi','like',$tanggal)->sum('subtotal');
+  $price = $data->where('tanggal_transaksi','like',$tanggal)->sum('total');
   $data_tgl .= "'$tgl',";
   $data_transaksi .= "'$jum',";
   $data_price .= "'$price',";
@@ -344,7 +344,7 @@ while($x < 10) {
  <script type="text/javascript">
    var tanggal = [<?= $data_tgl ?>];
    var transaksi = [<?= $data_transaksi ?>];
-   var subtotal = [<?= $data_price ?>];
+   var total = [<?= $data_price ?>];
 
    // Grafik LINE per-minggu
    var ctxLine = document.getElementById('chartjs-line')
@@ -356,7 +356,7 @@ while($x < 10) {
         borderColor: '#B5BCF3'
       }, {
         label: 'Pendapatan',
-        data: subtotal,
+        data: total,
         borderColor: '#47467A'
       }]
     }

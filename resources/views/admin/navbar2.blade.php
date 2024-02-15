@@ -1,11 +1,11 @@
 <nav class="navbar navbar-expand  p-0">
- <a class="navbar-brand text-center col-xs-12 col-md-3 col-lg-2 mr-0" href="{{route('admin.home')}}">         <img src="{{url('polished/assets/ngapak.png')}}" alt="logo" width="120px"></a>
+ <a class="navbar-brand text-center col-xs-12 col-md-3 col-lg-2 mr-0" href="{{route('admin.home')}}">         <img src="{{url('polished/assets/tuang.png')}}" alt="logo" width="120px"></a>
   <button class="btn btn-link d-block d-md-none" data-toggle="collapse" data-target="#sidebar-nav" role="button" >
     <span class="oi oi-menu"></span>
   </button>
   
   <div class="border-primary-darkest bg-primary-darkest form-control d-none d-md-block w-60 ml-3 mr-5">
-    <marquee class="text-white" behavior="alternate" direction="">Selamat Datang di Halaman Backend dari Ngapak Resto.</marquee>
+    <marquee class="text-white" behavior="alternate" direction="">Selamat Datang di Halaman Backend dari Tuang Resto.</marquee>
   </div>
 
   <a class="navbar-brand text-right" href="{{route('menu-masakan')}}"><span class="oi oi-book"></span> Ke Menu Masakan</a>

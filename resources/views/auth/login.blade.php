@@ -1,28 +1,12 @@
 @extends('auth.main2')
 @section('title','Login')
 
-@push('css')
-<style>
-	.card {
-		background-color: rgba(255, 255, 255, 0.5);
-	}
-	.form-control {
-		background: rgba(255, 255, 255, 0.8);
-	    box-shadow: 0 1px 5px -2px rgba(0,0,0,.2);
-	}
-</style>
-@endpush
+
 
 @section('content')
 <div class="container">
 
-	<div class="row pt-5">
-		<div class="col-md-8">
-			<div class="intro text-white">
-				<h2><b><u>Aplikasi Table Service Restaurant.</u></b></h2>
-				<b>Sebuah Aplikasi Table Service yang Dirancang dengan Sistem POS (Point Of Sales), yang Dimana didalamnya Berisikan Sistem Client Server</b>
-			</div>
-		</div>
+	<div class="row d-flex justify-content-center align-items-center" style="height: 100vh;">
 
 		<div class="col-md-4">
           <div class="card bg-light-lightest shadow-md rounded">
@@ -64,7 +48,7 @@
 
 			        @if (Route::has('password.request'))
 					<div class="bottom">
-						<span class="helper-text"><i class="oi oi-lock"></i> <a class="text-white" href="{{ route('password.request') }}">Lupa password?</a></span>
+						<!-- <span class="helper-text"><i class="oi oi-lock"></i> <a class="text-primary-darker" href="{{ route('password.request') }}">Lupa password?</a></span> -->
 						<span class="helper-text"><i class="oi oi-lock"></i> <a class="text-primary-darker" href="{{ route('register') }}"><u>Register Akun</u></a></span>
 					</div>
 					@endif

@@ -190,10 +190,11 @@
 
 					<div class="form-group form-label-group">
 						<select name="level" class="form-control">
-							<option value="">Pilih Level Sebagai :</option>
+							<option value="" selected="" disabled="">Pilih Level Sebagai :</option>
 							<option value="admin">Admin</option>
 							<option value="waiter">Waiter</option>
 							<option value="kasir">Kasir</option>
+							<option value="kitchen">kitchen</option>
 							<option value="owner">Owner</option>
 							<option value="pelanggan">Pelanggan</option>
 						</select>

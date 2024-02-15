@@ -20,7 +20,7 @@ class reportController extends Controller
     {
         $data = DB::table('transactions')
             ->join('users', 'transactions.user_id', '=', 'users.id')
-            ->join('orders', 'transactions.order_id_order', '=', 'orders.id_order')
+            ->join('orders', 'transactions.id_order', '=', 'orders.id')
             ->select('transactions.*', 'users.fullname', 'orders.*')
             ->get();
         $pendapatan = Order::where('status_order','Beres')->sum('subtotal');
@@ -32,7 +32,7 @@ class reportController extends Controller
     {
     	$data = DB::table('transactions')
             ->join('users', 'transactions.user_id', '=', 'users.id')
-            ->join('orders', 'transactions.order_id_order', '=', 'orders.id_order')
+            ->join('orders', 'transactions.id_order', '=', 'orders.id')
             ->select('transactions.*', 'users.fullname', 'orders.*')
             ->where('orders.kode_order', $req->kode_order)
             ->get();
@@ -48,11 +48,8 @@ class reportController extends Controller
     public function delivery(Request $req)
     {
         $orders = Order::where('id_user',Auth::id())
-                ->orderBy('updated_at','desc')->take(1)->get();
-        $orders->transform(function($order) {
-            $order->cart = unserialize($order->cart);
-            return $order;
-        });
+                ->whereIn('status_order',['Menunggu Pembayaran','Pending'])
+                ->first();
         return view('admin.pages.report.delivery', compact('orders'));
     }
 
@@ -60,7 +57,7 @@ class reportController extends Controller
     {
         $data = DB::table('transactions')
             ->join('users', 'transactions.user_id', '=', 'users.id')
-            ->join('orders', 'transactions.order_id_order', '=', 'orders.id_order')
+            ->join('orders', 'transactions.id_order', '=', 'orders.id')
             ->select('transactions.*', 'users.fullname', 'orders.*')
             ->orderBy('transactions.updated_at','desc')
             ->get();

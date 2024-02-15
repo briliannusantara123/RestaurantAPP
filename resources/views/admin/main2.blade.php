@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>@yield('title') | Ngapak Resto</title>
+  <title>@yield('title') | Tuang Resto</title>
   <!-- <link rel="stylesheet" href="http://localhost:3000/css/bootstrap4/dist/css/bootstrap-custom.css?v=datetime"> -->
   <link rel="stylesheet" href="{{url('polished/css/polished.min.css')}}">
   <!-- <link rel="stylesheet" href="polaris-navbar.css"> -->
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="{{url('polished/css/font-awesome.min.css')}}">
   <link rel="stylesheet" href="{{url('polished/css/bounce.css')}}">
   <link rel="stylesheet" href="{{url('polished/css/dataTables.bootstrap4.min.css')}}">
-  <link rel="icon" href="{{url('polished/assets/fav.png')}}">
+  <link rel="icon" href="{{url('polished/assets/fav1.png')}}">
   <!-- swal -->
   <link rel="stylesheet" href="{{url('polished/js/swal/sweetalert2.min.css')}}">
   @stack('css')

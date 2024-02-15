@@ -30,9 +30,10 @@ class MasakanController extends Controller
 
    public function save(Request $req)
 {
+    $count = DB::table('masakan')->count();
     // Buat kode masakan
-    $blt = date('s');
-    $kode_mkn = 'MKN'.$blt;
+    $blt = date('ym');
+    $kode_mkn = 'MKN'.$blt. str_pad($count + 1, 5, '0', STR_PAD_LEFT);
 
 
     // Validasi input
@@ -50,7 +51,7 @@ class MasakanController extends Controller
 
     // Simpan data masakan
     $result = new Masakan;
-    $result->kode_masakan = $kode_mkn . sprintf("%02s", $req->kode_masakan);
+    $result->kode_masakan = $kode_mkn;
     $result->kategori_id = $req->kategori_id;
     $result->nama_masakan = $req->nama_masakan;
     $result->gambar = $filename;
@@ -58,10 +59,10 @@ class MasakanController extends Controller
     $result->status_masakan = $req->status_masakan;
     // Periksa apakah data berhasil disimpan
     if ($result->save()) {
-        alert()->success('Data Berhasil Tersimpan ke Database.', 'Tersimpan!')->autoclose(4000);
+        alert()->success('Data Berhasil Tersimpan ke Database.', 'Tersimpan!')->autoclose(2000);
         return redirect('/admin/masakan');
     } else {
-        alert()->info('Harap Periksa lagi data Formulir anda.','Tidak Tersimpan!')->autoclose(4000);
+        alert()->info('Harap Periksa lagi data Formulir anda.','Tidak Tersimpan!')->autoclose(2000);
     }
 }
 
@@ -110,10 +111,10 @@ class MasakanController extends Controller
         $result = Masakan::where('id',$req->id)->update($field);
 
         if ($result) {
-            alert()->success('Berhasil Mengupdate Data.', 'Terupdate!')->autoclose(4000);
+            alert()->success('Berhasil Mengupdate Data.', 'Terupdate!')->autoclose(2000);
             return redirect('/admin/masakan');
         } else {
-            alert()->info('Harap Periksa lagi data Formulir anda.','Tidak Tersimpan!')->autoclose(4000);
+            alert()->info('Harap Periksa lagi data Formulir anda.','Tidak Tersimpan!')->autoclose(2000);
         }
 
 
@@ -156,7 +157,7 @@ class MasakanController extends Controller
         $result->nama_kategori  = $req->kategori ;
 
         if ($result->save()) {
-            alert()->success('Data Berhasil Tersimpan ke Database.', 'Tersimpan!')->autoclose(4000);
+            alert()->success('Data Berhasil Tersimpan ke Database.', 'Tersimpan!')->autoclose(2000);
             return redirect()->route('admin.masakan.kategori');
         } else {
             return back()->with('result','fail');
@@ -179,7 +180,7 @@ class MasakanController extends Controller
         $result = Kategori::where('id',$req->id)->update(['nama_kategori' => $req->nama_kategori,]);
         
         if ($result) {
-            alert()->success('Berhasil Mengupdate Data.', 'Terupdate!')->autoclose(4000);
+            alert()->success('Berhasil Mengupdate Data.', 'Terupdate!')->autoclose(2000);
             return redirect()->route('admin.masakan.kategori');
         } else {
             return back()->with('result','fail');

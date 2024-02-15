@@ -27,19 +27,27 @@
       <td>
         <table class="table shadow-0">
             <tbody>
-              @foreach($order->cart->items as $item)
-              <tr>
-                <th scope="row">{{$loop->iteration}}</th>
-                <td>{{$item['item']['nama_masakan']}}</td>
-                <td>{{$item['qty']}}</td>
-                <td>Rp.{{number_format($item['harga']),0,',','.'}}</td>
-              </tr>
+              @foreach($od as $orderId => $items)
+                  @foreach($items as $item)
+                      <tr>
+                          <th scope="row">{{$loop->iteration}}</th>
+                          <td>{{$item->nama_masakan}}</td>
+                          <td>{{$item->qty}}</td>
+                          <td>Rp.{{ number_format($item->harga * $item->qty , 0, ',', '.') }}</td>
+                      </tr>
+                  @endforeach
               @endforeach
+
             </tbody>
         </table>
       </td>
       <td>
-        <a class="btn btn-success" href="{{route('payment', ['id_order' => $order->id_order])}}">Bayar</a>
+        <!-- <form method='post' action="{{route('payment', ['id_order' => $order->id_order] )}}">
+          @csrf
+          <button class="btn btn-success" type="submit">Bayar</button>
+        </form> -->
+        <a class="btn btn-success" href="{{route('payment', ['id_order' => $order->id])}}">Bayar</a>
+       <!--  <a href="{{route('payment', ['id_order' => $order->id_order] )}}">Bayar</a> -->
       </td>
     </tr>
     @endforeach
@@ -56,6 +64,6 @@
     // Auto Refresh Dashboard
      setTimeout(function(){
          location.reload();
-     },60000); // 5000 milliseconds atau 5 seconds.
+     },7000); // 5000 milliseconds atau 5 seconds.
 </script>
 @endpush

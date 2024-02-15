@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Order;
+use App\DetailOrder;
 use Auth;
 use Alert;
 
@@ -26,16 +27,17 @@ class OrderController extends Controller
 
     public function save(Request $req)
     {
-
-        $blt = date('ms');
-        $kode_ord = 'INV'.$blt.$idBaru;
+        $count = DB::table('orders')->count();
+        $blt = date('ym');
+        $kode_ord = 'ORD' . $blt . str_pad($count + 1, 5, '0', STR_PAD_LEFT);
+        $id_user = Auth::user()->id;
 
         $result = new Order;
-        $result->kode_order = $kode_ord.sprintf("%03s", $req->kode_order);
+        $result->kode_order = $kode_ord;
         $result->no_meja = $req->no_meja;
-        $result->id_user = $req->id_user;
+        $result->id_user = $id_user;
         $result->keterangan = $req->keterangan;
-        $result->status_order = $req->status_order;
+        $result->status_order = 'pending';
 
         if ($result->save()) {
             alert()->success('Data Berhasil Disimpan ke Database.','Tersimpan!')->autoclose(4000);
@@ -89,18 +91,30 @@ class OrderController extends Controller
     public function entri(Request $req)
     {     
         $orders = Order::where('status_order','Pending')->orderBy('updated_at','desc')->get();
-        $orders->transform(function($order) {
-            $order->cart = unserialize($order->cart);
-            return $order;
-        });
-        return view('admin.pages.order.entri.entri', compact('orders'));
+        $od = [];
+        foreach ($orders as $order) {
+            $orderDetails = DB::table('order_details')
+                                ->join('masakan', 'order_details.id_masakan', '=', 'masakan.id')
+                                ->select('order_details.*', 'masakan.harga', 'masakan.gambar', 'masakan.nama_masakan')
+                                ->where('id_order', $order->id)
+                                ->get();
+            $od[$order->id] = $orderDetails;
+        }
+        return view('admin.pages.order.entri.entri', compact('orders','od'));
     }
 
-    public function terimaEntri($id_order)
+    public function terimaEntri($id)
     {
-        $orders = Order::where('id_order',$id_order)->first();
-        $orders->update(['status_order' => 'Beres']);
-        alert()->success('Pesanan Berhasil Diantar!.','Berhasil!')->persistent('oke');
+        $orders = Order::where('id',$id)->first();
+        $od = DetailOrder::where('id_order',$orders->id)->whereIn('status',['Pending','Di Proses'])->get();
+
+        if (!$od->isEmpty()) {
+            alert()->warning('Belum Bisa Mengantarkan Karena Ada Masakan yang Belum Selesai.','Gagal!')->persistent('oke');
+        }else{
+            $orders->update(['status_order' => 'Beres']);
+            alert()->success('Pesanan Berhasil Diantar!.','Berhasil!')->persistent('oke');
+        }
+        
         return redirect()->route('entri.order');
     }
 

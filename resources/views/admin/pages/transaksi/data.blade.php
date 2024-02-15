@@ -48,9 +48,9 @@
 				      <td>{{date('d F Y - H:i', strtotime($dt->created_at))}}</td>
 				      <td>Rp.{{number_format($dt->total_bayar,0,',','.')}},</td>
 				      <td>
-				          <a href="{{route('invoice', ['kode_order' => $dt->kode_order])}}" class="btn btn-success btn-sm" target="_blank">
+				          <!-- <a href="{{route('invoice', ['kode_order' => $dt->kode_order])}}" class="btn btn-success btn-sm" target="_blank">
 				          	<span class="oi oi-print"></span>
-				          </a>
+				          </a> -->
 
 				          <button class="btn btn-danger btn-sm btn-trash"
 				          data-id="{{$dt->id}}"

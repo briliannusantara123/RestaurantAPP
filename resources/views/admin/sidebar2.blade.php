@@ -1,6 +1,7 @@
 <?php
   $entri =  App\Order::where('status_order', 'Pending')->get();
   $cashier =  App\Order::where('status_order', 'Menunggu Pembayaran')->get();
+  $kitchen =  App\DetailOrder::where('status', 'Pending')->get();
 
 ?>
 <div class="polished-sidebar bg-light col-12 col-md-3 col-lg-2 p-0 collapse d-md-inline" id="sidebar-nav">
@@ -13,7 +14,7 @@
       <li><a href="{{route('admin.user')}}"><span class="oi oi-people"></span> Users</a></li>
       <li><a href="{{ route('admin.masakan') }}"><span class="oi oi-puzzle-piece"></span></span> Daftar Masakan</a></li>
       <li><a href="{{route('admin.masakan.kategori')}}"><span class="oi oi-tags"></span> Kategori</a></li>
-      <li><a href="{{route('daftar.discounts')}}"><span class="oi oi-dollar"></span> Manage Discounts <span class="badge badge-danger">beta</span></a></li>
+      <!-- <li><a href="{{route('daftar.discounts')}}"><span class="oi oi-dollar"></span> Manage Discounts <span class="badge badge-danger">beta</span></a></li> -->
       @endif
 
       @if(Auth::user()->level =='admin' || Auth::user()->level =='waiter')
@@ -22,6 +23,9 @@
 
       @if(Auth::user()->level =='admin' || Auth::user()->level =='kasir')
       <li><a href="{{route('cashier')}}"><span class="oi oi-bell bell"></span> Cashier <span class="badge badge-warning float-right">{{$cashier->count()}}</span></a></li>
+      @endif
+      @if(Auth::user()->level =='admin' || Auth::user()->level =='kitchen')
+      <li><a href="{{route('kitchen')}}"><span class="oi oi-bell bell"></span> Kitchen <span class="badge badge-warning float-right">{{$kitchen->count()}}</span></a></li>
       @endif
 
       @if(Auth::user()->level =='admin' || Auth::user()->level =='kasir')

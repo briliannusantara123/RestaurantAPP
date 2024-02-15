@@ -35,8 +35,12 @@
 		            <thead class="border-0">
 		                <tr>
 					      <th scope="col">#</th>
+					      <th scope="col">Kode Masakan</th>
 					      <th scope="col">Gambar</th>
-					      <th scope="col">Item</th>
+					      <th scope="col">Nama</th>
+					      <th scope="col">Kategori</th>
+					      <th scope="col">Harga</th>
+					      <th scope="col">Stok</th>
 					      <th scope="col">Aksi</th>
 					    </tr>
 		            </thead>
@@ -44,21 +48,19 @@
 		              @foreach($data as $dt)
 		              <tr>
 		                  <th scope="row">{{$loop->iteration}}</th>
+		                  <td>{{$dt->kode_masakan}}</td>
 					      <td><a href="{{url('storage/gambar/'.$dt->gambar)}}"><img class="img-fluid" src="{{url('storage/gambar/'.$dt->gambar)}}" width="75px"></a></td>
-					      <td>
-					      	<small class="text-muted">{{$dt->kode_masakan}}</small><br>
-							<strong>{{$dt->nama_masakan}}</strong>,
-							Harga Rp.{{number_format($dt->harga,0,',','.')}}, 
-							Stok <?php 
+					      <td>{{$dt->nama_masakan}}</td>
+					      <td>{{$dt->nama_kategori}}</td>
+					      <td>Rp.{{number_format($dt->harga,0,',','.')}}</td>
+					      <td><?php 
 				            if ($dt['status_masakan']=='Ada') {
 				                echo "<span class='badge badge-success'>Ada</span>";
 				            } else {
 				                echo "<span class='badge badge-danger'>Habis</span>";
 				            }
-				     		?>
-							<br>
-							<small class="text-muted">{{$dt->nama_kategori}}</small>
-					      </td>
+				     		?></td>
+					      
 
 					      <td>
 					          <!-- kolom edit -->

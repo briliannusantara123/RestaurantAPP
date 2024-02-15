@@ -8,13 +8,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>@yield('title') | Ngapak Resto</title>
+  <title>@yield('title') | Tuang Resto</title>
   <!-- <link rel="stylesheet" href="http://localhost:3000/css/bootstrap4/dist/css/bootstrap-custom.css?v=datetime"> -->
   <link rel="stylesheet" href="{{url('polished/css/polished.min.css')}}">
   <!-- <link rel="stylesheet" href="polaris-navbar.css"> -->
   <link rel="stylesheet" href="{{url('polished/css/open-iconic-bootstrap.min.css')}}">
 
-  <link rel="icon" href="{{url('polished/assets/fav.png')}}">
+  <link rel="icon" href="{{url('polished/assets/fav1.png')}}">
   @stack('css')
 
 </head>
@@ -61,13 +61,13 @@
 <body>
 
 <nav class="navbar navbar-expand p-0 bg-success-darkest sticky-top">
- <a class="navbar-brand text-center col-xs-12 col-md-3 col-lg-2 mr-0" href="{{route('menu-masakan')}}">         <img src="{{url('polished/assets/ngapak.png')}}" alt="logo" width="120px"></a>
+ <a class="navbar-brand text-center col-xs-12 col-md-3 col-lg-2 mr-0" href="{{route('menu-masakan')}}">         <img src="{{url('polished/assets/tuang.png')}}" alt="logo" width="120px"></a>
   
   <div class="border-success-darker bg-success-darker form-control d-none d-md-block w-60 ml-3 mr-5">
-    <marquee class="text-white" behavior="alternate" direction="">Selamat Datang di Ngapak Resto, Semoga harimu Menyenangkan.</marquee>
+    <marquee class="text-white" behavior="alternate" direction="">Selamat Datang di Tuang Resto, Semoga harimu Menyenangkan.</marquee>
   </div>
 
-  <a class="navbar-brand text-right" href="{{route('shopping.cart')}}"><i class="oi oi-cart"></i> Cart <span class="badge badge-warning">{{Session::has('cart') ? Session::get('cart')->totalQty : '' }}</span></a>
+  <a class="navbar-brand text-right" href="{{route('shopping.cart')}}"><i class="oi oi-cart"></i> Cart <span class="badge badge-warning">{{$count ? $count : 0 }}</span></a>
 
   <a class="navbar-brand text-right" href="{{route('history')}}"><span class="oi oi-book"></span> History</a>
 

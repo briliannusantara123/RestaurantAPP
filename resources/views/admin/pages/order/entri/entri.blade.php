@@ -20,42 +20,63 @@
                   <th scope="col">No Meja</th>
                   <th scope="col">Dipesan pada</th>
                   <th scope="col">Item</th>
-                  <th scope="col">Keterangan</th>
                   <th scope="col">Total</th>
                   <th scope="col">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 @foreach($orders as $order)
-                <tr>
-                  <th scope="row">{{$loop->iteration}}</th>
-                  <td>{{$order->kode_order}}</td>
-                  <td>{{$order->no_meja}}</td>
-                  <td>
-                    {{\Carbon\Carbon::parse($order->created_at)->diffForHumans()}}
-                  </td>
-                  <td>
-                      <table class="table shadow-0">
-                          <tbody>
-                            @foreach($order->cart->items as $item)
-                            <tr>
-                              <th scope="row">{{$loop->iteration}}</th>
-                              <td>{{$item['item']['nama_masakan']}}</td>
-                              <td>{{$item['qty']}}</td>
-                              <td>Rp.{{number_format($item['harga']),0,',','.'}}</td>
-                            </tr>
-                            @endforeach
-                          </tbody>
-                      </table>
-                  </td>
-                  <td>{{$order->keterangan}}</td>
-                  <td class="text-success-darkest">Rp. {{number_format($order->subtotal),0,',','.'}}</td>
+                  <tr>
+                      <th scope="row">{{$loop->iteration}}</th>
+                      <td>{{$order->kode_order}}</td>
+                      <td>{{$order->no_meja}}</td>
+                      <td>{{\Carbon\Carbon::parse($order->created_at)->diffForHumans()}}</td>
+                      <td>
+                          <table class="table shadow-0">
+                            <thead class="border-0">
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Masakan</th>
+                                  <th scope="col">Jumlah</th>
+                                  <th scope="col">Keterangan</th>
+                                  <th scope="col">Harga</th>
+                                  <th scope="col">Status</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                  @foreach($od as $orderId => $items)
+                                        @foreach($items as $item)
+                                            <tr>
+                                                <th scope="row">{{$loop->iteration}}</th>
+                                                <td>{{$item->nama_masakan}}</td>
+                                                <td>{{$item->qty}}</td>
+                                                <td>{{$item->keterangan}}</td>
+                                                <td>Rp.{{ number_format($item->harga, 0, ',', '.') }}</td>
+                                                <td>
+                                                  @if($item->status == 'Pending')
+                                                    <span class='badge badge-danger text-light'>{{$item->status}}</span>
 
-                  <td>
-                    <a class="btn btn-success waiter" href="{{route('entri.accept', ['id_order'=>$order->id_order])}}">Diantar</a>
-                  </td>
-                </tr>
-                @endforeach
+                                                  @elseif($item->status == 'Di Proses')
+                                                    <span class='badge badge-warning text-dark'>{{$item->status}}</span>
+                                                  @else
+                                                    <span class='badge badge-success'>{{$item->status}}</span>
+                                                  @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endforeach
+  
+                              </tbody>
+                          </table>
+                      </td>
+                      <td class="text-success-darkest">Rp. {{number_format($order->total, 0, ',', '.')}}</td> <!-- Memperbaiki tanda kurung penutup di sini -->
+
+                      <td>
+                          <a class="btn btn-success waiter" href="{{route('entri.accept', ['id'=>$order->id])}}">Antarkan Pesanan</a> <!-- Memperbaiki properti yang digunakan di sini -->
+                      </td>
+                  </tr>
+              @endforeach
+
               </tbody>
           </table>
         </div>

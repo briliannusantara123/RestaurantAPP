@@ -9,7 +9,7 @@ use App\DetailOrder;
 use App\Kategori;
 use Auth;
 use Alert;
-
+use Illuminate\Support\Facades\DB;
 use Session;
 
 use Illuminate\Http\Request;
@@ -23,22 +23,30 @@ class FrontEndController extends Controller
 
     public function menu(Request $req)
     {   
+        $id_user = Auth::user()->id;
+        $count = DB::table('cart')
+                    ->where('id_user',$id_user)
+                    ->count();
     	$data = Masakan::join('kategori','kategori.id','masakan.kategori_id')
             ->orWhere('nama_masakan','like',"%{$req->keyword}%")
             ->orWhere('kategori.id',$req->kategori_id)
             ->select('masakan.*','nama_kategori')
             ->orderBy('updated_at','desc')
             ->paginate(9);
-            return view('frontend2.menu', compact('data'));
+            return view('frontend2.menu', compact('data','count'));
     }
 
     public function showCategory($id)
     {
+        $id_user = Auth::user()->id;
+        $count = DB::table('cart')
+                    ->where('id_user',$id_user)
+                    ->count();
         $data = Masakan::where('kategori_id', $id)
         ->join('kategori','kategori.id','masakan.kategori_id')
         ->select('masakan.*','nama_kategori')
         ->paginate(9);
-        return view('frontend2.menu', compact('data'));
+        return view('frontend2.menu', compact('data','count'));
     }
 
     public function showItem(Request $req, $id)
@@ -51,12 +59,35 @@ class FrontEndController extends Controller
 
     public function AddToCart(Request $req, $id)
     {
-        $data = Masakan::findOrFail($id);
-        $oldCart = Session::has('cart') ? Session::get('cart') : null;
-        $cart = new Cart($oldCart);
-        $cart->add($data, $data->id);
+        $id_user = Auth::user()->id;
+        $masakan = Masakan::find($id);
+        $cart = Cart::where('id_masakan', $id)->where('id_user', $id_user)->first();
 
-        $req->session()->put('cart', $cart);
+        if ($cart) {
+            // Jika item sudah ada di keranjang, tambahkan satu ke jumlahnya dan update
+            $cart->qty = $cart->qty + 1;
+            $cart->save(); // Update data yang sudah ada di database
+        } else {
+            // Jika item belum ada di keranjang, tambahkan baru
+            $result = new Cart;
+            $result->id_user = $id_user;
+            $result->id_masakan = $masakan->id;
+            $result->qty = 1;
+            $result->save(); // Simpan data baru ke database
+        }
+
+        
+        // Periksa apakah data berhasil disimpan
+        
+        alert()->success('Berhasil menambahkan masakan ke dalam keranjang belanja', 'Berhasil!')->autoclose(2000);
+            
+        
+        // $data = Masakan::findOrFail($id);
+        // $oldCart = Session::has('cart') ? Session::get('cart') : null;
+        // $cart = new Cart($oldCart);
+        // $cart->add($data, $data->id);
+
+        // $req->session()->put('cart', $cart);
         //return json_encode($req->session()->get('cart'));
 
         return back()->with('result','success');
@@ -65,56 +96,62 @@ class FrontEndController extends Controller
 
     public function getRemoveItem($id)
     {
-        $oldCart = Session::has('cart') ? Session::get('cart') : null;
-        $cart = new Cart($oldCart);
-        $cart->removeItem($id);
-
-        if (count($cart->items) > 0) {
-            Session::put('cart', $cart);
-        } else {
-            Session::forget('cart');
-        }
-        
-        return redirect()->route('shopping.cart');
+        $cart = Cart::find($id);
+        $cart->delete($cart);
+        return redirect()->route('shopping.cart')->with('success', 'Item berhasil dihapus dari keranjang belanja.');
     }
+
 
     public function getReduceByOne($id)
     {
-        $oldCart = Session::has('cart') ? Session::get('cart') : null;
-        $cart = new Cart($oldCart);
-        $cart->reduceByOne($id);
-
-        if (count($cart->items) > 0) {
-            Session::put('cart', $cart);
-        } else {
-            Session::forget('cart');
+        $cart = Cart::where('id', $id)->first();
+        if ($cart->qty == 1) {
+            $cart = Cart::find($id);
+            $cart->delete($cart);
+        }else{
+            $cart->qty = $cart->qty - 1;
+            $cart->save();
         }
-
         return redirect()->route('shopping.cart');
     }
 
     public function getAddOne($id)
     {
-        $oldCart = Session::has('cart') ? Session::get('cart') : null;
-        $cart = new Cart($oldCart);
-        $cart->addOne($id);
-
-        Session::put('cart', $cart);
+        $cart = Cart::where('id', $id)->first();
+        $cart->qty = $cart->qty + 1;
+        $cart->save();
         return redirect()->route('shopping.cart');
     }
 
     public function getCart()
     {
-        if (!Session::has('cart')) {
-            return view('frontend2.shopping-cart');
-        }   
-        //$ppn = (['totalPrice']*10%);
-        $oldCart = Session::get('cart');
-        $cart = new Cart($oldCart);
-        return view('frontend2.shopping-cart', ['data' => $cart->items, 'totalPrice'=>$cart->totalPrice]);
+        $id_user = Auth::user()->id;
+        $count = DB::table('cart')
+                    ->where('id_user',$id_user)
+                    ->count();
+        $data = DB::table('cart')->join('masakan', 'cart.id_masakan', '=', 'masakan.id')
+                ->select('cart.*','masakan.harga','masakan.gambar','masakan.nama_masakan','masakan.id as id_masakan')
+                ->where('cart.id_user', $id_user)
+                ->get();
+        $total = 0;
+
+        foreach ($data as $item) {
+            $subtotal = $item->harga * $item->qty;
+            $total += $subtotal;
+        }
+
+        return view('frontend2.shopping-cart', ['data' => $data,'total' => $total,'count' => $count]);
         //return response()->json(['data' => $cart->items, 'totalPrice'=>$cart->totalPrice]); 
     }
 
+    public function AddNote(Request $request,$id)
+    {
+        $cart = Cart::where('id', $id)->first();
+        $cart->keterangan = $request->keterangan;
+        $cart->save();
+        alert()->success('Berhasil menambahkan keterangan', 'Berhasil')->autoclose(2000);
+        return redirect()->route('shopping.cart');
+    }
     public function destroy()
     {
         Session::forget('cart');
@@ -123,73 +160,104 @@ class FrontEndController extends Controller
 
     public function getCheckout()
     {
-        if (!Session::has('cart')) {
-            return view('frontend2.shopping-cart');
+        $id_user = Auth::user()->id;
+        $data = DB::table('cart')->join('masakan', 'cart.id_masakan', '=', 'masakan.id')
+                ->select('cart.*','masakan.harga','masakan.gambar','nama_masakan')
+                ->where('cart.id_user', $id_user)
+                ->get();
+        $total = 0;
+
+        foreach ($data as $item) {
+            $subtotal = $item->harga * $item->qty;
+            $total += $subtotal;
         }
-        $oldCart = Session::get('cart');
-        $cart = new Cart($oldCart);
-        $total = $cart->totalPrice;
-        return view('frontend2.checkout', ['data' => $cart->items, 'total' => $total]);
+        return view('frontend2.checkout', ['data' => $data, 'total' => $total]);
         //return response()->json(['data'=> $cart->items, 'total' => $total]);
     }
 
     public function postCheckout(Request $req)
-    {
-        if (!Session::has('cart')) {
-            return redirect()->route('shopping.cart');
-        }
+{
+    // Buat kode order
+    $id_user = Auth::user()->id;
+    $cart = Cart::where('id_user',$id_user);
+    $cart->delete($cart);
 
-        $oldCart = Session::get('cart');
-        $cart = new Cart($oldCart);
+    $count = DB::table('cart')->count();
+    $blt = date('ym');
+    $kode_ord = 'ORD' . $blt . str_pad($count + 1, 5, '0', STR_PAD_LEFT);
 
-        $check = Order::where('no_meja', $req->no_meja)->where('status_order','!=','Beres')->count();
-        if ($check > 0) {
-            return back()->with('info',1);
-        }
+    $order = new Order;
+    $order->kode_order = $kode_ord;
+    $order->no_meja = $req->nomeja;
+    $order->id_user = $id_user;
+    $order->total = $req->total;
+    $order->status_order = 'Menunggu Pembayaran';
+    $order->save();
+    $order->refresh();
 
-         //buat kode order
-        $blt = date('ms');
-        $kode_ord = 'INV'.$blt;
+    $data = [];
+
+for ($i = 0; $i < count($req->id_masakan); $i++) {
+    $data[] = [
+        'id_order' => $order->id,
+        'id_masakan' => $req->id_masakan[$i],
+        'qty' => $req->qty[$i],
+        'keterangan' => $req->keterangan[$i],
+        'subtotal' => $req->subtotal[$i],
+        'status' => 'Pending'
+    ];
+}
+
+DB::table('order_details')->insert($data);
 
 
-        try {
-            //insert order,
-            $order = new Order;
-            $order->kode_order = $kode_ord.sprintf("%03s", $req->kode_order);
-            $order->no_meja = $req->no_meja;
-            $order->id_user = $req->id_user;
-            $order->cart = serialize($cart);
-            $order->subtotal = $cart->totalPrice;
-            $order->keterangan = $req->keterangan;
-            $order->status_order = $req->status_order;
-            $order->save();
-        } catch (Exception $e) {
-            
-        }
-        alert()->success('Silahkan lakukan Pembayaran ke Kasir!.', 'Order Berhasil')->persistent('oke');
-        Session::forget('cart');
-        return redirect()->route('thankyou')->with('result','success');      
-    }
+    alert()->success('Silahkan lakukan Pembayaran ke Kasir!.', 'Order Berhasil')->persistent('oke');
+    return redirect()->route('thankyou')->with('result','success');
+}
+
 
     public function thanks()
     {
-        $orders = Order::where('id_user',Auth::id())
-                ->orderBy('updated_at','desc')->take(1)->get();
-        $orders->transform(function($order) {
-            $order->cart = unserialize($order->cart);
-            return $order;
-        });
-        return view('frontend2.thanks', compact('orders'));
+        $id_user = Auth::user()->id;
+        $count = DB::table('cart')
+                    ->where('id_user',$id_user)
+                    ->count();
+        $order = DB::table('orders')
+                ->where('id_user', $id_user)
+                ->where('status_order','Menunggu Pembayaran')
+                ->first();
+        $od = DB::table('order_details')
+                ->join('masakan', 'order_details.id_masakan', '=', 'masakan.id')
+                ->select('order_details.*','masakan.harga','masakan.gambar','masakan.nama_masakan')
+                ->where('id_order', $order->id)
+                ->get();
+        return view('frontend2.thanks', ['order' => $order,'od' => $od,'count' => $count]);
     }
 
     public function history()
     {
-        $orders = Order::where('id_user',Auth::id())
-                ->orderBy('updated_at','desc')->get();
-        $orders->transform(function($order) {
-            $order->cart = unserialize($order->cart);
-            return $order;
-        });
-        return view('frontend2.history', compact('orders'));   
+        $id_user = Auth::user()->id;
+        $count = DB::table('cart')
+                    ->where('id_user',$id_user)
+                    ->count();
+        $orders = DB::table('orders')
+                ->where('id_user', $id_user)
+                ->orderBy('updated_at','desc')
+                ->get();
+
+        $orderDetails = [];
+        foreach ($orders as $o) {
+            $od = DB::table('order_details')
+                ->join('masakan', 'order_details.id_masakan', '=', 'masakan.id')
+                ->select('order_details.*','masakan.harga','masakan.gambar','masakan.nama_masakan')
+                ->where('id_order', $o->id)
+                ->get();
+
+            // Simpan hasil dari setiap iterasi dalam array
+            $orderDetails[$o->id] = $od;
+        }
+        
+        return view('frontend2.history', compact('orders', 'orderDetails','count'));   
     }
+
 }

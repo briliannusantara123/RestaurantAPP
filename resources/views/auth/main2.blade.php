@@ -15,13 +15,13 @@
   <link rel="stylesheet" href="{{url('polished/css/open-iconic-bootstrap.min.css')}}">
   <link rel="stylesheet" href="{{url('polished/css/font-awesome.min.css')}}">
 
-  <link rel="icon" href="{{url('polished/assets/fav.png')}}">
+  <link rel="icon" href="{{url('polished/assets/fav1.png')}}">
   @stack('css')
 
   <style>
     .container-fluid {
-      background: linear-gradient(rgba(29, 93, 221, 0.81), rgba(29, 93, 221, 0.81)),
-      url('polished/assets/background.png') no-repeat center center fixed; 
+      background:
+      url('polished/assets/bg.jpg') no-repeat center center fixed; 
       -webkit-background-size: cover;
       -moz-background-size: cover;
       -o-background-size: cover;

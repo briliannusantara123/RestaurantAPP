@@ -8,7 +8,7 @@ Route::get('/', function() {
 // FRONTEND ROUTING
 Route::group(['prefix' => 'frontend','middleware'=>['auth']], function() {
 	Route::get('/', function() {
-		return redirect('/frontend/menu');
+		return view('admin.pages.dashboard');
 	})->name('admin.home');
 	
 	//tampilkan menu masakan (database)
@@ -21,9 +21,10 @@ Route::group(['prefix' => 'frontend','middleware'=>['auth']], function() {
 
 	//fungsi show,menambah,menghapus item session yang ada pada cart
 	Route::get('/show/{id}','FrontEndController@showItem')->name('show.item');
-	Route::get('/add{id}', 'FrontEndController@getAddOne')->name('addone');
-	Route::get('/reduce{id}', 'FrontEndController@getReduceByOne')->name('reducebyone');
-	Route::get('/remove{id}', 'FrontEndController@getRemoveItem')->name('remove.items');
+	Route::get('/add/{id}', 'FrontEndController@getAddOne')->name('addone');
+	Route::get('/reduce/{id}', 'FrontEndController@getReduceByOne')->name('reducebyone');
+	Route::post('/note/{id}', 'FrontEndController@AddNote')->name('note');
+	Route::get('/remove/{id}', 'FrontEndController@getRemoveItem')->name('remove.items');
 	Route::get('cancel','FrontEndController@destroy')->name('cancel');
 
 	//view cart
@@ -31,10 +32,10 @@ Route::group(['prefix' => 'frontend','middleware'=>['auth']], function() {
 	// View History Order
 	Route::get('/history', 'FrontEndController@history')->name('history');
 
-	//view checkout untuk verifikasi tagihan
-	Route::get('/checkout','FrontEndController@getCheckout')->name('checkout');
+	// //view checkout untuk verifikasi tagihan
+	// Route::get('/checkout','FrontEndController@getCheckout')->name('checkout');
 	//kirim data ke tabel detail order
-	Route::post('/checkout', 'FrontEndController@postCheckout')->name('postcheckout');
+	Route::post('/checkout', 'FrontEndController@postCheckout')->name('checkout');
 
 	//Ucapan Terimakasih
 	Route::get('/thanks','FrontEndController@thanks')->name('thankyou');
@@ -120,11 +121,21 @@ Route::group(['prefix'=>'admin','middleware'=>['auth']], function() {
 	Route::group(['prefix'=>'cashier','middleware'=>'level.admin:kasir'], function()
 	{
 		Route::get('/','TransaksiController@kasir')->name('cashier');
-		Route::get('/payment/{id_order}','TransaksiController@payment')->name('payment');
-		Route::post('/payment','TransaksiController@bayar')->name('bayar');
+		Route::get('/payment/{id}/payment','TransaksiController@payment')->name('payment');
+		Route::post('/payment/{id}','TransaksiController@bayar')->name('bayar');
 		Route::get('/finish/{id_order}','TransaksiController@getFinish')->name('getFinish');
 	});
 	// End Cashier
+	//kitchen Route
+	// Route::group(['prefix'=>'kitchen','middleware'=>'level.admin:kitchen'], function()
+	// {
+		Route::get('/','TransaksiController@kitchen')->name('kitchen');
+		Route::post('/proses/{id}/{tipe}','TransaksiController@proses')->name('proses');
+		Route::get('/payment/{id}/payment','TransaksiController@payment')->name('payment');
+		Route::post('/payment/{id}','TransaksiController@bayar')->name('bayar');
+		Route::get('/finish/{id_order}','TransaksiController@getFinish')->name('getFinish');
+	// });
+	// End kitchen
 
 	// Transaksi Route
 	Route::group(['prefix'=>'transaksi','middleware'=>'level.admin:kasir'], function()

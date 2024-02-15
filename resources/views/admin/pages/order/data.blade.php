@@ -52,7 +52,7 @@
 			            } elseif($dt['status_order']=='Menunggu Pembayaran') {
 			            	echo "<span class='badge badge-warning'>Menunggu Pembayaran</span>";
 			            } elseif($dt['status_order']=='Beres') {
-			            	echo "<span class='badge badge-success'>Beres</span>";
+			            	echo "<span class='badge badge-success'>Selesai</span>";
 			            } else {
 			            	echo "<span class='badge badge-danger'>Dibatalkan</span>";
 			            }
@@ -60,9 +60,9 @@
 				      </td>
 
 				      <td>
-				          <a href="{{route('admin.order.edit', ['id_order'=>$dt->id_order])}}" class="btn btn-success btn-sm">
+				          <!-- <a href="{{route('admin.order.edit', ['id_order'=>$dt->id_order])}}" class="btn btn-success btn-sm">
 				          	<span class="oi oi-pencil"></span>
-				          </a>
+				          </a> -->
 
 				          <button class="btn btn-danger btn-sm btn-trash"
 				          data-id="{{$dt->id_order}}"

@@ -7,7 +7,7 @@
 	<h1 class="text-center mt-4 mb-4">Riwayat Semua Data Order User Ini</h1>
 	<hr>
 	
-	@if($orders->isEmpty())
+	@if(!$orders)
 	<div class="col">
 		<h4 class="text-center text-muted">Riwayat pesanan kosong...</h4>
 	</div>
@@ -20,23 +20,23 @@
 		  </div>
 		  <div class="card-body">
 		    <ul class="list-group list-group-flush">
-				@foreach($order->cart->items as $item)
-			    <li class="list-group-item">
-			    	<span class="badge badge-dark float-right">Rp.{{number_format($item['harga'],0,',','.')}},</span>
-			    	{{$item['item']['nama_masakan']}}<span class="badge badge-warning float-right">{{$item['qty']}} Qty</span> 
-			    </li>
-				@endforeach
+		    	@foreach($orderDetails[$order->id] as $index => $od)
+	                <li class="list-group-item">
+						  <span class="badge badge-dark float-right">Rp.{{ number_format($od->harga, 0, ',', '.') }},</span>
+						   {{ $od->nama_masakan }}<span class="badge badge-warning float-right">{{$od->qty}} Qty</span> 
+					</li>
+            	@endforeach
 			 </ul>
 		  </div>
 		  <div class="card-footer">
-		    <strong class="float-right" style="text-transform: uppercase; color: green;">Total : Rp.{{number_format($order->subtotal,0,',','.')}},</strong><span class="badge badge-dark">Diorder pada : {{date('d F Y - H:i', strtotime($order->created_at))}}</span> <span class="badge badge-secondary">Status	:
+		    <strong class="float-right" style="text-transform: uppercase; color: green;">Total : Rp.{{number_format($order->total,0,',','.')}},</strong><span class="badge badge-dark">Diorder pada : {{date('d F Y - H:i', strtotime($order->created_at))}}</span> <span class="badge badge-secondary">Status	:
             <?php 
-		            if ($order['status_order']=='Pending') {
+		            if ($order->status_order=='Pending') {
 		                echo "<span class='badge badge-primary bounce'>Menunggu Diantar</span>";
-		            } elseif($order['status_order']=='Menunggu Pembayaran') {
+		            } elseif($order->status_order=='Menunggu Pembayaran') {
 		            	echo "<span class='badge badge-warning'>Menunggu Pembayaran</span>";
-		            } elseif($order['status_order']=='Beres') {
-		            	echo "<span class='badge badge-success'>Beres</span>";
+		            } elseif($order->status_order=='Beres') {
+		            	echo "<span class='badge badge-success'>Pemesanan Selesai</span>";
 		            } else {
 		            	echo "<span class='badge badge-danger'>Dibatalkan</span>";
 		            }
@@ -50,3 +50,8 @@
 </div>
 
 @endsection
+<script type="text/javascript">
+	setTimeout(function(){
+         location.reload();
+     },10000); // 5000 milliseconds atau 5 seconds.
+</script>

@@ -45,6 +45,7 @@ class LoginController extends Controller
     protected function redirectTo()
     {
         $user = Auth::user();
+        session(['user_id' => $user->id]);
 
         if ($user['level'] == 'pelanggan') {
             return route('menu-masakan');
@@ -52,6 +53,8 @@ class LoginController extends Controller
             return route('cashier');
         } else if($user['level']=='waiter') {
             return route('entri.order');
+        } else if($user['level']=='kitchen') {
+            return route('kitchen');
         } else {
             return route('admin.home');
         }

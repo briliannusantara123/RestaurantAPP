@@ -10,9 +10,8 @@ use Carbon\Carbon;
 class Order extends Model
 {
     protected $table = 'orders';
-    protected $primaryKey = 'id_order';
 
-    protected $fillable = ['kode_order','no_meja','id_user','cart','subtotal','keterangan','status_order'];
+    protected $fillable = ['kode_order','no_meja','id_user','cart','subtotal','status_order'];
 
     public static function getId()
     {

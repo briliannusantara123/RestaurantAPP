@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetailOrder extends Model
 {
-    protected $table = 'masakan_order';
+    protected $table = 'order_details';
     protected $fillable = [
         'order_id_order',
-        'masakan_id',
+        'id_masakan',
         'qty',
         'subtotal',
-        'keterangan_detail',
-        'status_detail_order'
+        'keterangan',
+        'status'
     ];
 
 }
