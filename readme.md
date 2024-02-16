@@ -7,13 +7,10 @@ Kasir Resto adalah Restourant Management yang sebuah Website yang bisa managemne
 
 Sistem ini dibuat dengan menggunakan framework <a href="https://laravel.com/">Laravel</a> dan <a href="https://www.mysql.com/">MySQL</a>
 
-## 🧑 Pemilik
-
-| Profile | Keterangan  |
-|---------|--------------|
-| Nama    | BAGUS BUDI SATOTO |
-| Jurusan | Informatika |
-| Kampus  | Universitas Amikom Yogyakarta |
+| Profile  | Keterangan  |
+|----------|-------------|
+| Kelompok | 5           |
+| Kampus   | ITBS        |
 
 
 ## 📌 Fitur dari Kasir Resto
@@ -36,7 +33,7 @@ Sistem ini dibuat dengan menggunakan framework <a href="https://laravel.com/">La
 
 1. **Clone Repository**
 ```bash
-git clone https://github.com/bagussatoto/Kasir-Restoran-laravel-8.git 
+git clone https://github.com/briliannusantara123/RestaurantAPP.git
 ```
 
 ```
@@ -78,14 +75,5 @@ php artisan serve
 ## Jika ada pertanyaan silahkan hubungi saya di email :
 
 ```
-bagusbudi1308@gmail.com
+briliannusantara123@gmail.com
 ```
-
-## Request Fitur Baru dan Pelaporan Bug
-
-Anda dapat meminta fitur baru maupun melaporkan bug melalui menu **issues** yang sudah disediakan oleh GitHub (lihat menu di atas), posting issues baru dan kita akan berdiskusi disana.
-
-## Berkontribusi
-
-Siapapun dapat berkontribusi pada proyek ini mulai dari pemrograman, pembuakan buku manual, sampai dengan mengenalkan produk ini kepada masyarakat Indonesia agar mengurangi kesenjangan pendidikan teknologi dengan cara membuat postingan issue di repository ini.
-
