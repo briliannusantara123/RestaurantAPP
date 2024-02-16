@@ -5,10 +5,7 @@ namespace App\Http\Controllers;
 use App\Masakan;
 use App\Cart;
 use App\Order;
-use App\DetailOrder;
-use App\Kategori;
 use Auth;
-use Alert;
 use Illuminate\Support\Facades\DB;
 use Session;
 
@@ -24,28 +21,27 @@ class FrontEndController extends Controller
     public function menu(Request $req)
     {   
         $id_user = Auth::user()->id;
-        $count = DB::table('cart')
-                    ->where('id_user',$id_user)
-                    ->count();
+        $count = DB::table('cart')->where('id_user',$id_user)->count();
     	$data = Masakan::join('kategori','kategori.id','masakan.kategori_id')
             ->orWhere('nama_masakan','like',"%{$req->keyword}%")
             ->orWhere('kategori.id',$req->kategori_id)
             ->select('masakan.*','nama_kategori')
             ->orderBy('updated_at','desc')
             ->paginate(9);
-            return view('frontend2.menu', compact('data','count'));
+
+        return view('frontend2.menu', compact('data','count'));
     }
 
     public function showCategory($id)
     {
         $id_user = Auth::user()->id;
-        $count = DB::table('cart')
-                    ->where('id_user',$id_user)
-                    ->count();
+        $count = DB::table('cart')->where('id_user',$id_user)->count();
+
         $data = Masakan::where('kategori_id', $id)
-        ->join('kategori','kategori.id','masakan.kategori_id')
-        ->select('masakan.*','nama_kategori')
-        ->paginate(9);
+            ->join('kategori','kategori.id','masakan.kategori_id')
+            ->select('masakan.*','nama_kategori')
+            ->paginate(9);
+
         return view('frontend2.menu', compact('data','count'));
     }
 
@@ -54,6 +50,7 @@ class FrontEndController extends Controller
         $oldCart = Session::has('cart') ? Session::get('cart') : null;
 
         $data = Masakan::where('id',$id)->first();
+
         return view('frontend2.show', ['data'=>$data]);
     }
 
@@ -171,8 +168,8 @@ class FrontEndController extends Controller
             $subtotal = $item->harga * $item->qty;
             $total += $subtotal;
         }
+
         return view('frontend2.checkout', ['data' => $data, 'total' => $total]);
-        //return response()->json(['data'=> $cart->items, 'total' => $total]);
     }
 
     public function postCheckout(Request $req)
@@ -181,8 +178,9 @@ class FrontEndController extends Controller
     $id_user = Auth::user()->id;
     $cart = Cart::where('id_user',$id_user);
     $cart->delete($cart);
+    
+    $count = Order::count();
 
-    $count = DB::table('cart')->count();
     $blt = date('ym');
     $kode_ord = 'ORD' . $blt . str_pad($count + 1, 5, '0', STR_PAD_LEFT);
 
