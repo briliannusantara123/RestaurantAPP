@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class MainRepository 
@@ -35,6 +34,15 @@ class MainRepository
         )->get();
     }
 
+    public function paginateWhere(int $perPage, ?callable $where, ?array $relations, ?array $orderBy = ['id', 'ASC'])
+    {
+        return $this->model->where($where)
+            ->when($relations, fn ($q) => $q->with($relations))
+            ->when($where, fn($q) => $q->where($where))
+            ->orderBy($orderBy[0], $orderBy[1])
+            ->paginate($perPage);
+    }
+
     public function findById(int $id)
     {
         return $this->model->find($id);
@@ -42,7 +50,7 @@ class MainRepository
 
     public function create(array $data) 
     {
-        return $this->create($data);
+        return $this->model->create($data);
     }
 
     public function update(array $data, int $id) 
