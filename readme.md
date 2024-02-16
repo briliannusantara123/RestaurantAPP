@@ -25,7 +25,7 @@ Sistem ini dibuat dengan menggunakan framework <a href="https://laravel.com/">La
 |  6  | Sweet Alert 2 Included.                                    |
 |  7  | Pendataan Dengan Datatable agar lebih cepat & efisien.     |
 |  8  | Chart/Grafik Pendapatan mingguan dengan library Chart.JS.  |
-|  9  | 5 Hak Akses (Admin, Kasir, Owner, Waiter, Pelanggan)       |
+|  9  | 6 Hak Akses (Admin, Kasir, Owner, Waiter, Kitchen, Pelanggan)       |
 | 10  | User Settings                                              |
 
 ------------
