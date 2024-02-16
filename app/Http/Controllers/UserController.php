@@ -3,114 +3,115 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\User;
-use Auth;
-use Alert;
 use App\Exports\UsersExport;
+use App\Repositories\UserRepository;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function daftar(Request $req)
-    {
-    	$data = User::where('fullname','like',"%{$req->keyword}%")
-        ->orderBy('updated_at','desc')
-        ->get();
-    	return view('admin.pages.user.daftar', ['data'=>$data]);
-    }
+	private $userRepository;
 
-    //  public function add()
-    // {
-        
-    // 	return view('admin.pages.user.add');
-    // }
+	public function __construct(UserRepository $userRepository)
+	{
+		$this->userRepository = $userRepository;
+	}
 
-     public function save(Request $req)
-    {
-    	\Validator::make($req->all(), [
-    		'fullname'=>'required|between:3,100',
-    		'email'=>'required|email|unique:users,email',
-            'username'=>'required|between:4,50|unique:users,username|alpha_dash',
-    		'password'=>'nullable|min:6',
-    		'repassword'=>'same:password',
-    		'level'=>'required',
-    	])->validate();
+	public function daftar(Request $req)
+	{
+		$data = $this->userRepository->getWhereAdvanced(
+			fn ($q) => $q->where('fullname', 'like', "%{$req->keyword}%"),
+			['updated_at', 'DESC'],
+			null,
+			null
+		);
 
-    	$result = new User;
-    	$result->fullname = $req->fullname;
-        $result->username = $req->username;
-    	$result->email = $req->email;
-    	$result->password = bcrypt($req->password);
-    	$result->level = $req->level;
+		return view('admin.pages.user.daftar', ['data' => $data]);
+	}
 
-    	if ($result->save()) {
-    		alert()->success('Data Berhasil Tersimpan ke Database.', 'Tersimpan!')->autoclose(4000);
-            return redirect()->route('admin.user');
-    	} else {
-    		alert()->info('Harap Periksa lagi data Formulir anda.','Tidak Tersimpan!')->autoclose(4000);
-    	}
-    	
-    }
+	public function save(Request $req)
+	{
+		Validator::make($req->all(), [
+			'fullname' => 'required|between:3,100',
+			'email' => 'required|email|unique:users,email',
+			'username' => 'required|between:4,50|unique:users,username|alpha_dash',
+			'password' => 'nullable|min:6',
+			'repassword' => 'same:password',
+			'level' => 'required',
+		])->validate();
 
-    public function edit($id)
-    {
-    	$data = User::where('id',$id)->first();
-    	return view('admin.pages.user.edit', ['rc'=>$data]);
-    }
+		$result = $this->userRepository->create([
+			'fullname' 	=> $req->fullname,
+			'username' 	=> $req->username,
+			'email' 	=> $req->email,
+			'password' 	=> bcrypt($req->password),
+			'level' 	=> $req->level
+		]);
 
-    public function update(Request $req) {
-    	\Validator::make($req->all(), [
-    		'fullname'=>'required|between:3,100',
-            'username'=>'required|between:4,50|unique:users,username,'.$req->id.',|alpha_dash',
-    		'email'=>'required|email|unique:users,email,'.$req->id,
-    		'password'=>'nullable|min:6',
-    		'repassword'=>'same:password',
-            'level'=>'required',
-    	])->validate();
+		if ($result) {
+			alert()->success('Data Berhasil Tersimpan ke Database.', 'Tersimpan!')->autoclose(4000);
+			return redirect()->route('admin.user');
+		} else {
+			alert()->info('Harap Periksa lagi data Formulir anda.', 'Tidak Tersimpan!')->autoclose(4000);
+		}
+	}
 
-    	if(!empty($req->password)) {
-    		$field = [
-    			'fullname'=>$req->fullname,
-                'username'=>$req->username,
-    			'email'=>$req->email,
-    			'level'=>$req->level,
-    			'password'=>bcrypt($req->password),
-    		];
-    	} else {
-    		$field = [
-    			'fullname'=>$req->fullname,
-                'username'=>$req->username,
-    			'email'=>$req->email,
-                'level'=>$req->level,
-    		];
-    	}
+	public function edit($id)
+	{
+		$data = $this->userRepository->findById($id);
+		return view('admin.pages.user.edit', ['rc' => $data]);
+	}
 
-    	$result = User::where('id',$req->id)->update($field);
+	public function update(Request $req)
+	{
+		Validator::make($req->all(), [
+			'fullname' => 'required|between:3,100',
+			'username' => 'required|between:4,50|unique:users,username,' . $req->id . ',|alpha_dash',
+			'email' => 'required|email|unique:users,email,' . $req->id,
+			'password' => 'nullable|min:6',
+			'repassword' => 'same:password',
+			'level' => 'required',
+		])->validate();
 
-    	if ($result) {
-    		alert()->success('Berhasil Mengupdate Data.', 'Terupdate!')->autoclose(4000);
-            return redirect()->route('admin.user');
-    	} else {
-    		alert()->info('Harap Periksa lagi data Formulir anda.','Tidak Tersimpan!')->autoclose(4000);
-    	}
-    	
-    }
+		if (!empty($req->password)) {
+			$field = [
+				'fullname' => $req->fullname,
+				'username' => $req->username,
+				'email' => $req->email,
+				'level' => $req->level,
+				'password' => bcrypt($req->password),
+			];
+		} else {
+			$field = [
+				'fullname' => $req->fullname,
+				'username' => $req->username,
+				'email' => $req->email,
+				'level' => $req->level,
+			];
+		}
 
-    public function delete(Request $req)
-    {
-    	$result = User::find($req->id);
+		$result = $this->userRepository->update($field, $req->id);
 
-    	if ($result->delete() ){
-    		alert()->success('Data Berhasil Terhapus dari Database.', 'Terhapus!')->autoclose(3000);
-            return redirect()->route('admin.user');
-    	}
-    	
-    }
+		if ($result) {
+			alert()->success('Berhasil Mengupdate Data.', 'Terupdate!')->autoclose(4000);
+			return redirect()->route('admin.user');
+		} else {
+			alert()->info('Harap Periksa lagi data Formulir anda.', 'Tidak Tersimpan!')->autoclose(4000);
+		}
+	}
 
-    public function exportExcel() 
-    {
-        return Excel::download(new UsersExport, 'DataUsers.xlsx');
-    }
+	public function delete(Request $req)
+	{
+		$result = $this->userRepository->delete($req->id);
 
+		if ($result) {
+			alert()->success('Data Berhasil Terhapus dari Database.', 'Terhapus!')->autoclose(3000);
+			return redirect()->route('admin.user');
+		}
+	}
+
+	public function exportExcel()
+	{
+		return Excel::download(new UsersExport, 'DataUsers.xlsx');
+	}
 }

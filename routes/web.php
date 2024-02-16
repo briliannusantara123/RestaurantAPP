@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
 // Tampilkan Halaman Login di Awal
 Route::get('/', function() {
 	return view('auth.login');

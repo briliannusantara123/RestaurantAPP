@@ -34,7 +34,16 @@ class MainRepository
         )->get();
     }
 
-    public function paginateWhere(int $perPage, ?callable $where, ?array $relations, ?array $orderBy = ['id', 'ASC'])
+    public function getWhereAdvanced(callable $where, ?array $orderBy = ['id', 'ASC'], ?array $relations = null, ?int $limit = null)
+    {
+        return $this->model->where($where)
+            ->when($relations, fn ($q) => $q->with($relations))
+            ->when($limit, fn($q) => $q->limit($limit))
+            ->orderBy($orderBy[0], $orderBy[1])
+            ->get();
+    }
+
+    public function paginateWhere(int $perPage, ?callable $where = null, ?array $relations = null, ?array $orderBy = ['id', 'ASC'])
     {
         return $this->model->where($where)
             ->when($relations, fn ($q) => $q->with($relations))
