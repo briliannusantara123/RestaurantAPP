@@ -43,7 +43,7 @@
 				      <td>{{$dt->kode_order}}</td>
 				      <td>{{$dt->no_meja}}</td>
 				      <td>{{date('d F Y - H:i', strtotime($dt->created_at))}}</td>
-				      <td>{{$dt->fullname}}</td>
+				      <td>{{$dt->user->fullname}}</td>
 				      <td>{{$dt->keterangan}}</td>
 				      <td>
 				      	<?php 

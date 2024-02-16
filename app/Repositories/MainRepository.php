@@ -67,6 +67,11 @@ class MainRepository
         return $this->findById($id)->update($data);
     }
 
+    public function updateWhere(array $data, array $where) 
+    {
+        return $this->model->where($where)->update($data);
+    }
+
     public function delete($id) 
     {
         return $this->findById($id)->delete();
