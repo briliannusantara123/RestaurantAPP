@@ -4,18 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Masakan;
 use App\Kategori;
+use App\Repositories\KategoriRepository;
 use App\Repositories\MasakanRepository;
-use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class MasakanController extends Controller
 {
-    private $masakanRepository;
+    private $masakanRepository, $kategoriRepository;
 
-    public function __construct(MasakanRepository $masakanRepository)
-    {
+    public function __construct(
+        KategoriRepository $kategoriRepository,
+        MasakanRepository $masakanRepository
+    ) {
         $this->masakanRepository = $masakanRepository;
+        $this->kategoriRepository = $kategoriRepository;
     }
 
     public function daftar(Request $req)
@@ -27,6 +31,7 @@ class MasakanController extends Controller
             ->select('masakan.*', 'nama_kategori')
             ->orderBy('updated_at', 'desc')
             ->get();
+
         return view('admin.pages.masakan.daftar', ['data' => $data]);
     }
 
@@ -144,7 +149,13 @@ class MasakanController extends Controller
     //READ KATEGORI
     public function daftarKategori(Request $req)
     {
-        $data = Kategori::where('nama_kategori', 'like', "%{$req->keyword}%")->orderBy('updated_at', 'desc')->paginate(10);
+        $data = $this->kategoriRepository->paginateWhere(
+            10, 
+            fn($q) => $q->where('nama_kategori', 'like', "%{$req->keyword}%"), 
+            [], 
+            ['updated_at', 'DESC']
+        );
+        
         return view('admin.pages.masakan.kategori.daftar', ['data' => $data]);
     }
 
@@ -159,11 +170,11 @@ class MasakanController extends Controller
             'kategori' => 'required|between:3,100|unique:kategori,nama_kategori',
         ])->validate();
 
-        $result = new Kategori;
+        $result = $this->kategoriRepository->create([
+            'nama_kategori' => $req->kategori
+        ]);
 
-        $result->nama_kategori  = $req->kategori;
-
-        if ($result->save()) {
+        if ($result) {
             alert()->success('Data Berhasil Tersimpan ke Database.', 'Tersimpan!')->autoclose(2000);
             return redirect()->route('admin.masakan.kategori');
         } else {
@@ -173,7 +184,8 @@ class MasakanController extends Controller
 
     public function editKategori($id)
     {
-        $data = Kategori::where('id', $id)->first();
+        $data = $this->kategoriRepository->findById($id);
+
         return view('admin.pages.masakan.kategori.edit', ['rc' => $data]);
     }
 
@@ -183,7 +195,7 @@ class MasakanController extends Controller
             'nama_kategori' => 'required|between:3,100|unique:kategori,nama_kategori,' . $req->id,
         ])->validate();
 
-        $result = Kategori::where('id', $req->id)->update(['nama_kategori' => $req->nama_kategori,]);
+        $result = $this->kategoriRepository->update(['nama_kategori' => $req->nama_kategori], $req->id);
 
         if ($result) {
             alert()->success('Berhasil Mengupdate Data.', 'Terupdate!')->autoclose(2000);
@@ -195,7 +207,7 @@ class MasakanController extends Controller
 
     public function deleteKategori(Request $req)
     {
-        $result = Kategori::find($req->id);
+        $result = $this->kategoriRepository->delete($req->id);
 
         if ($result->delete()) {
             alert()->success('Data Berhasil Terhapus dari Database.', 'Terhapus!')->autoclose(3000);
